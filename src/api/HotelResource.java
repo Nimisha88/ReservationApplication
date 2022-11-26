@@ -14,7 +14,7 @@ public class HotelResource {
         return CustomerService.getCustomer(email);
     }
 
-    public void createACustomer(String email, String firstName, String lastName) {
+    public void createACustomer(String email, String firstName, String lastName) throws IllegalArgumentException {
         CustomerService.addCustomer(email, firstName, lastName);
     }
 
@@ -23,11 +23,22 @@ public class HotelResource {
     }
 
     public Reservation bookARoom(String email, IRoom room, Date checkIn, Date checkOut) {
-        return ReservationService.reserveARoom(getCustomer(email), room, checkIn, checkOut);
+        Customer customer = getCustomer(email);
+        if (customer != null) {
+            return ReservationService.reserveARoom(customer, room, checkIn, checkOut);
+        } else {
+            return null;
+        }
     }
 
     public Collection<Reservation> getCustomersReservation(String email) {
-        return ReservationService.getCustomersReservation(getCustomer(email));
+        Customer customer = getCustomer(email);
+        if (customer != null) {
+            return ReservationService.getCustomersReservation(customer);
+        } else {
+            System.out.println("\u001B[31m" + "No such Customer Account found with the given email!" + "\u001B[0m");
+            return null;
+        }
     }
 
     public Collection<IRoom> findARoom(Date checkIn, Date checkOut) {

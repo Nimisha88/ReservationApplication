@@ -21,6 +21,6 @@ public class Reservation {
                 "Customer *** " + customer + "\n" +
                 "Room *** " + room + "\n" +
                 "CheckInDate: " + checkInDate + "\n" +
-                "CheckOutDate: " + checkOutDate + "\n";
+                "CheckOutDate: " + checkOutDate;
     }
 }
