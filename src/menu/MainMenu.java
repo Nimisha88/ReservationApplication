@@ -3,15 +3,16 @@ package menu;
 import api.HotelResource;
 import model.IRoom;
 import model.Reservation;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MainMenu {
 
     public static Scanner scanner = new Scanner(System.in);
     public static HotelResource hotelAPI = new HotelResource();
+
+    /**
+     * Display Main Menu
+     */
     private static void printMenu() {
         System.out.println("\u001B[33m\u001B[1m" + "***** Main Menu *****" + "\u001B[0m");
         System.out.println("1. Find and reserve a room");
@@ -22,67 +23,102 @@ public class MainMenu {
         System.out.println("\u001B[33m\u001B[1m" + "*********************" + "\u001B[0m");
     }
 
-    private static void findAndReserve() {
-        Date checkIn;
-        Date checkOut;
+    /**
+     * Helper function to fetch Check In and Check Out dates
+     * @param dateType Check In/Check Out
+     * @return Check In/Check Out Date
+     */
+    private static Date fetchDateForReservation(String dateType) {
+        Date date;
         while(true) {
             try {
-                System.out.println("Please enter Check In date (MM/DD/YYYY):");
-                checkIn = new Date(scanner.nextLine().trim());
+                System.out.println("Please enter " + dateType + " date (MM/DD/YYYY):");
+                date = new Date(scanner.nextLine().trim());
                 break;
             }
             catch (IllegalArgumentException e) {
                 System.out.println("\u001B[31m" + "Please input a valid date" + "\u001B[0m");
             }
         }
+        return date;
+    }
 
-        while(true) {
-            try {
-                System.out.println("Please enter Check Out date (MM/DD/YYYY):");
-                checkOut = new Date(scanner.nextLine().trim());
-                break;
-            }
-            catch (IllegalArgumentException e) {
-                System.out.println("\u001B[31m" + "Please input a valid date" + "\u001B[0m");
-            }
-        }
-
+    /**
+     * Helper function to fetch and display Available Rooms for the reservation period
+     * @param checkIn Check In Date
+     * @param checkOut Check Out Date
+     * @return True if rooms are available, False if not
+     */
+    private static boolean displayAvailableRooms(Date checkIn, Date checkOut) {
         try {
             Collection<IRoom> rooms = hotelAPI.findARoom(checkIn, checkOut);
-            for(IRoom room : rooms) {
-                System.out.println(room);
-            }
             if(rooms.isEmpty()) {
                 System.out.println("\u001B[31m" + "Sorry! No rooms are available for that period!" + "\u001B[0m");
-                return;
+                return false;
+            } else {
+                for(IRoom room : rooms) {
+                    System.out.println(room);
+                }
+                return true;
             }
         }
         catch (Exception e) {
             System.out.println("\u001B[31m" + "Encountered error in finding available rooms. Please try again later!" + "\u001B[0m");
-            return;
-        }
-        System.out.println("Enter Room Number of the room you would like to reserve:");
-        String response = scanner.nextLine().trim();
-        IRoom reserveRoom = hotelAPI.getRoom(response);
-        if (reserveRoom != null) {
-            System.out.println("Please provide email for reservation:");
-            String email = scanner.nextLine().trim();
-            Reservation newReservation = hotelAPI.bookARoom(email, reserveRoom, checkIn, checkOut);
-            if (newReservation == null) {
-                System.out.println("You are a new Customer, creating a new account.");
-                if (!createAnAccount(email)) {
-                    System.out.println("\u001B[31m" + "Reservation unsuccessful!" + "\u001B[0m");
-                    return;
-                }
-                newReservation = hotelAPI.bookARoom(email, reserveRoom, checkIn, checkOut);
-            }
-            System.out.println("\u001B[32m" + "Reservation successful!" + "\u001B[0m");
-            System.out.println(newReservation);
-        } else {
-            System.out.println("\u001B[31m" + "No such room exists or is available for reservation! Please try again." + "\u001B[0m");
+            return false;
         }
     }
 
+    /**
+     * Helper function to reserve a room
+     * @param room Room to be reserved
+     * @param checkIn Check In Date
+     * @param checkOut Check Out Date
+     */
+    private static void reserveRoom(IRoom room, Date checkIn, Date checkOut) {
+        System.out.println("Please provide email for reservation:");
+        String email = scanner.nextLine().trim();
+        Reservation newReservation = hotelAPI.bookARoom(email, room, checkIn, checkOut);
+        if (newReservation == null) {
+            System.out.println("You are a new Customer, creating a new account.");
+            if (!createAnAccount(email)) {
+                System.out.println("\u001B[31m" + "Reservation unsuccessful!" + "\u001B[0m");
+                return;
+            }
+            newReservation = hotelAPI.bookARoom(email, room, checkIn, checkOut);
+        }
+        System.out.println("\u001B[32m" + "Reservation successful!" + "\u001B[0m");
+        System.out.println(newReservation);
+    }
+
+    /**
+     * Find available rooms and reserve a room
+     */
+    private static void findAndReserve() {
+        Date checkIn;
+        Date checkOut;
+        Boolean areRoomsAvailable;
+
+        // Fetch Reservation Dates
+        checkIn = fetchDateForReservation("Check In");
+        checkOut = fetchDateForReservation("Check Out");
+        // Display available rooms
+        areRoomsAvailable = displayAvailableRooms(checkIn, checkOut);
+
+        if(areRoomsAvailable) {
+            System.out.println("Enter Room Number of the room you would like to reserve:");
+            String response = scanner.nextLine().trim();
+            IRoom reserveRoom = hotelAPI.getRoom(response);
+            if (reserveRoom != null) {
+                reserveRoom(reserveRoom, checkIn, checkOut);
+            } else {
+                System.out.println("\u001B[31m" + "No such room exists or is available for reservation! Please try again." + "\u001B[0m");
+            }
+        }
+    }
+
+    /**
+     * Fetch reservations associated to an account
+     */
     private static void fetchMyReservations() {
         System.out.println("Please enter your email:");
         String email = scanner.next().trim();
@@ -99,6 +135,11 @@ public class MainMenu {
         }
     }
 
+    /**
+     * Create a Customer Account
+     * @param email email of Customer
+     * @return True if account was created successfully, False if not
+     */
     private static boolean createAnAccount(String email) {
         System.out.println("Please enter your first name:");
         String fname = scanner.nextLine().trim().toUpperCase();
@@ -123,6 +164,9 @@ public class MainMenu {
         return true;
     }
 
+    /**
+     * Display Main Menu and handle user input
+     */
     public static void displayMainMenu() {
         boolean displayMenu = true;
         boolean printMenuAvailable = false;

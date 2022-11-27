@@ -3,8 +3,6 @@ package service;
 import model.Customer;
 import model.IRoom;
 import model.Reservation;
-import model.Room;
-
 import java.util.*;
 
 public class ReservationService {
@@ -14,18 +12,36 @@ public class ReservationService {
     public static Map<Customer, ArrayList<Integer>> customerReservationMap = new HashMap<Customer, ArrayList<Integer>>();
     public static Map<String , ArrayList<Date[]>> roomDatesMap = new HashMap<String , ArrayList<Date[]>>();
 
+    /**
+     * Add a room
+     * @param room Room with info about room number, price and room type
+     */
     public static void addRoom(IRoom room) {
         rooms.put(room.getRoomNumber(), room);
     }
 
+    /**
+     * Get a room by room number
+     * @param roomId Room number
+     * @return Room
+     */
     public static IRoom getARoom(String roomId) {
         return rooms.get(roomId);
     }
 
+    /**
+     * Get all rooms
+     * @return Rooms
+     */
     public static Collection<IRoom> getAllRooms() {
         return rooms.values();
     }
 
+    /**
+     * Helper function to store a Customer and Reservation mapping for a new reservation
+     * @param customer
+     * @param reservationIndex
+     */
     static void mapCustomerReservation(Customer customer, int reservationIndex) {
         ArrayList<Integer> reservationIndices = new ArrayList<Integer>();
         if (customerReservationMap.get(customer) != null) {
@@ -35,6 +51,12 @@ public class ReservationService {
         customerReservationMap.put(customer, reservationIndices);
     }
 
+    /**
+     * Helper function to store a Room Number and CheckIn/CheckOut Dates mapping for a new reservation
+     * @param roomNumber
+     * @param checkIn
+     * @param checkOut
+     */
     static void mapRoomReservationDates(String roomNumber, Date checkIn, Date checkOut) {
         ArrayList<Date[]> reservationDates = new ArrayList<Date[]>();
         if (roomDatesMap.get(roomNumber) != null) {
@@ -44,6 +66,14 @@ public class ReservationService {
         roomDatesMap.put(roomNumber, reservationDates);
     }
 
+    /**
+     * Create a new reservation
+     * @param customer Customer
+     * @param room Room
+     * @param checkIn Check In Date
+     * @param checkOut Check Out
+     * @return New Reservation
+     */
     public static Reservation reserveARoom(Customer customer, IRoom room, Date checkIn, Date checkOut) {
         Reservation newBooking = new Reservation(customer, room, checkIn, checkOut);
         // Add new reservation in reservations list
@@ -57,6 +87,12 @@ public class ReservationService {
         return newBooking;
     }
 
+    /**
+     * Find available rooms for a given check in and check out time
+     * @param checkIn
+     * @param checkOut
+     * @return
+     */
     public static Collection<IRoom> findRooms(Date checkIn, Date checkOut) {
         // TODO: Deduce the logic to derive unbooked rooms for the tenure
         Collection<IRoom> allRooms = getAllRooms();
@@ -79,6 +115,11 @@ public class ReservationService {
         return availableRooms;
     }
 
+    /**
+     * Fetch all reservations of a customer
+     * @param customer Customer
+     * @return Reservations
+     */
     public static Collection<Reservation> getCustomersReservation(Customer customer) {
         List<Reservation> customerReservations = new ArrayList<Reservation>();
         ArrayList<Integer> reservationIndices = customerReservationMap.get(customer);
@@ -90,6 +131,9 @@ public class ReservationService {
         return customerReservations;
     }
 
+    /**
+     * Print all reservations
+     */
     public static void printAllReservation() {
         for(Reservation reservation: reservations) {
             System.out.println(reservation);
