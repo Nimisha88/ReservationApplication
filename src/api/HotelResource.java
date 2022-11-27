@@ -36,7 +36,6 @@ public class HotelResource {
         if (customer != null) {
             return ReservationService.getCustomersReservation(customer);
         } else {
-            System.out.println("\u001B[31m" + "No such Customer Account found with the given email!" + "\u001B[0m");
             return null;
         }
     }

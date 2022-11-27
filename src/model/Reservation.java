@@ -17,10 +17,10 @@ public class Reservation {
 
     @Override
     public String toString() {
-        return "*** Reservation ***" + "\n" +
-                "Customer *** " + customer + "\n" +
-                "Room *** " + room + "\n" +
-                "CheckInDate: " + checkInDate + "\n" +
-                "CheckOutDate: " + checkOutDate;
+        return "\u001B[36m" + "***** Reservation *****" + "\u001B[0m" + "\n" +
+                customer + "\n" +
+                room + "\n" +
+                "CheckInDate *** " + checkInDate + "\n" +
+                "CheckOutDate *** " + checkOutDate;
     }
 }

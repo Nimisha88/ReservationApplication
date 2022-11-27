@@ -52,9 +52,14 @@ public class MainMenu {
             for(IRoom room : rooms) {
                 System.out.println(room);
             }
+            if(rooms.isEmpty()) {
+                System.out.println("\u001B[31m" + "Sorry! No rooms are available for that period!" + "\u001B[0m");
+                return;
+            }
         }
         catch (Exception e) {
             System.out.println("\u001B[31m" + "Encountered error in finding available rooms. Please try again later!" + "\u001B[0m");
+            return;
         }
         System.out.println("Enter Room Number of the room you would like to reserve:");
         String response = scanner.nextLine().trim();
@@ -74,7 +79,7 @@ public class MainMenu {
             System.out.println("\u001B[32m" + "Reservation successful!" + "\u001B[0m");
             System.out.println(newReservation);
         } else {
-            System.out.println("\u001B[31m" + "No such room exists! Please try again." + "\u001B[0m");
+            System.out.println("\u001B[31m" + "No such room exists or is available for reservation! Please try again." + "\u001B[0m");
         }
     }
 
@@ -83,6 +88,7 @@ public class MainMenu {
         String email = scanner.next().trim();
         Collection<Reservation> myReservations = hotelAPI.getCustomersReservation(email);
         if (myReservations == null) {
+            System.out.println("\u001B[31m" + "No such Customer Account found with the given email!" + "\u001B[0m");
             return;
         } else if (myReservations.isEmpty()) {
             System.out.println("\u001B[32m" + hotelAPI.getCustomer(email).getFullName() + " (" + email + ") has no reservations" + "\u001B[0m");

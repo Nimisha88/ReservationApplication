@@ -7,6 +7,7 @@ public class FreeRoom extends Room{
 
     @Override
     public String toString() {
-        return super.toString();
+        return super.toString() +
+                "\u001B[33m" + "FreeRoom" + "\u001B[0m" + " *** ";
     }
 }

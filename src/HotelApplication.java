@@ -2,10 +2,7 @@ import api.AdminResource;
 import api.HotelResource;
 import menu.AdminMenu;
 import menu.MainMenu;
-import model.Customer;
-import model.IRoom;
-import model.Room;
-import model.RoomType;
+import model.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,14 +19,14 @@ public class HotelApplication {
         rooms.add(new Room("101", 20.00, RoomType.SINGLE));
         rooms.add(new Room("102", 60.00, RoomType.DOUBLE));
         rooms.add(new Room("103", 50.00, RoomType.SINGLE));
-        rooms.add(new Room("104", 70.00, RoomType.DOUBLE));
+        rooms.add(new FreeRoom("104", RoomType.DOUBLE));
         adminAPI.addRoom(rooms);
 
         hotelAPI.createACustomer("nv@gmail.com", "N", "V");
         hotelAPI.createACustomer("vg@gmail.com", "V", "G");
         hotelAPI.createACustomer("vrg@gmail.com", "VR", "G");
 
-        hotelAPI.bookARoom("nv@gmail.com",hotelAPI.getRoom("104"), new Date("12/10/2022"), new Date("12/12/2022"));
+        hotelAPI.bookARoom("nv@gmail.com",hotelAPI.getRoom("104"), new Date("12/10/2022"), new Date("12/15/2022"));
 
         MainMenu.displayMainMenu();
     }
