@@ -65,4 +65,14 @@ public class Customer {
                 " Name: " + firstname + " " + lastname + " *** " +
                 "Email: " + email + " *** ";
     }
+
+    @Override
+    public boolean equals(Object object) {
+        return this.email.equals(((Customer)object).email)? true : false;
+    }
+
+    @Override
+    public int hashCode() {
+        return email.hashCode();
+    }
 }

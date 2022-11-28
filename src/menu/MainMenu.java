@@ -3,12 +3,17 @@ package menu;
 import api.HotelResource;
 import model.IRoom;
 import model.Reservation;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainMenu {
 
-    public static Scanner scanner = new Scanner(System.in);
-    public static HotelResource hotelAPI = new HotelResource();
+    private static Calendar cal = Calendar.getInstance();
+    private static Scanner scanner = new Scanner(System.in);
+    private static HotelResource hotelAPI = new HotelResource();
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
 
     /**
      * Display Main Menu
@@ -29,14 +34,23 @@ public class MainMenu {
      * @return Check In/Check Out Date
      */
     private static Date fetchDateForReservation(String dateType) {
-        Date date;
-        while(true) {
+        Date date = null;
+        Date today = new Date();
+        boolean getDate = true;
+        while(getDate) {
             try {
                 System.out.println("Please enter " + dateType + " date (MM/DD/YYYY):");
-                date = new Date(scanner.nextLine().trim());
-                break;
+                date = dateFormatter.parse(scanner.nextLine().trim());
+                if (date.after(today)) {
+                    getDate = false;
+                } else {
+                    System.out.println("\u001B[31m" + "Date is before today! Please provide a valid input." + "\u001B[0m");
+                }
             }
             catch (IllegalArgumentException e) {
+                System.out.println("\u001B[31m" + "Please input a valid date" + "\u001B[0m");
+            }
+            catch (ParseException e) {
                 System.out.println("\u001B[31m" + "Please input a valid date" + "\u001B[0m");
             }
         }
@@ -53,7 +67,7 @@ public class MainMenu {
         try {
             Collection<IRoom> rooms = hotelAPI.findARoom(checkIn, checkOut);
             if(rooms.isEmpty()) {
-                System.out.println("\u001B[31m" + "Sorry! No rooms are available for that period!" + "\u001B[0m");
+                System.out.println("\u001B[31m" + "Sorry! No rooms available for " + dateFormatter.format(checkIn) + " - " + dateFormatter.format(checkOut) + "\u001B[0m");
                 return false;
             } else {
                 for(IRoom room : rooms) {
@@ -91,18 +105,46 @@ public class MainMenu {
     }
 
     /**
+     * Add a number of days to a given Date
+     * @param date Date
+     * @param numOfDays Number of days to be added
+     * @return Date + Number of Days
+     */
+    private static Date addDaysToADate(Date date, int numOfDays) {
+        cal.setTime(date);
+        cal.add(Calendar.DATE, numOfDays);
+        return cal.getTime();
+    }
+
+    /**
      * Find available rooms and reserve a room
      */
     private static void findAndReserve() {
+        Date today = new Date();
         Date checkIn;
         Date checkOut;
         Boolean areRoomsAvailable;
 
         // Fetch Reservation Dates
-        checkIn = fetchDateForReservation("Check In");
-        checkOut = fetchDateForReservation("Check Out");
+        while(true) {
+            checkIn = fetchDateForReservation("Check In");
+            checkOut = fetchDateForReservation("Check Out");
+            if (checkIn.before(checkOut)) {
+                break;
+            } else {
+                System.out.println("\u001B[31m" + "CheckOut is before CheckIn! Please provide a valid input." + "\u001B[0m");
+            }
+        }
+
         // Display available rooms
         areRoomsAvailable = displayAvailableRooms(checkIn, checkOut);
+
+        if(!areRoomsAvailable) {
+            checkIn = addDaysToADate(checkIn, 7);
+            checkOut = addDaysToADate(checkOut, 7);
+            System.out.println("\u001B[32m" + "Fetching rooms available after 7 days i.e. " + dateFormatter.format(checkIn) + " - " + dateFormatter.format(checkOut) + "\u001B[0m");
+            areRoomsAvailable = displayAvailableRooms(checkIn, checkOut);
+        }
 
         if(areRoomsAvailable) {
             System.out.println("Enter Room Number of the room you would like to reserve:");
