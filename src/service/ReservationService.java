@@ -7,16 +7,36 @@ import java.util.*;
 
 public class ReservationService {
 
-    public static Map<String, IRoom> rooms = new HashMap<String, IRoom>();
-    public static List<Reservation> reservations= new ArrayList<Reservation>();
-    public static Map<Customer, ArrayList<Integer>> customerReservationMap = new HashMap<Customer, ArrayList<Integer>>();
-    public static Map<String , ArrayList<Date[]>> roomDatesMap = new HashMap<String , ArrayList<Date[]>>();
+    private static ReservationService INSTANCE;
+    private Map<String, IRoom> rooms = new HashMap<String, IRoom>();
+    private List<Reservation> reservations= new ArrayList<Reservation>();
+    private Map<Customer, ArrayList<Integer>> customerReservationMap = new HashMap<Customer, ArrayList<Integer>>();
+    private Map<String , ArrayList<Date[]>> roomDatesMap = new HashMap<String , ArrayList<Date[]>>();
+
+    /**
+     * ReservationService Constructor
+     */
+    private ReservationService() {
+        // Do nothing!
+    }
+
+    /**
+     * Getting instance of singleton object
+     * @return ReservationService object
+     */
+    public static ReservationService getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE = new ReservationService();
+        }
+        return INSTANCE;
+    }
+
 
     /**
      * Add a room
      * @param room Room with info about room number, price and room type
      */
-    public static void addRoom(IRoom room) {
+    public void addRoom(IRoom room) {
         rooms.put(room.getRoomNumber(), room);
     }
 
@@ -25,7 +45,7 @@ public class ReservationService {
      * @param roomId Room number
      * @return Room
      */
-    public static IRoom getARoom(String roomId) {
+    public IRoom getARoom(String roomId) {
         return rooms.get(roomId);
     }
 
@@ -33,7 +53,7 @@ public class ReservationService {
      * Get all rooms
      * @return Rooms
      */
-    public static Collection<IRoom> getAllRooms() {
+    public Collection<IRoom> getAllRooms() {
         return rooms.values();
     }
 
@@ -42,7 +62,7 @@ public class ReservationService {
      * @param customer
      * @param reservationIndex
      */
-    static void mapCustomerReservation(Customer customer, int reservationIndex) {
+    void mapCustomerReservation(Customer customer, int reservationIndex) {
         ArrayList<Integer> reservationIndices = new ArrayList<Integer>();
         if (customerReservationMap.get(customer) != null) {
             reservationIndices = customerReservationMap.get(customer);
@@ -57,7 +77,7 @@ public class ReservationService {
      * @param checkIn
      * @param checkOut
      */
-    static void mapRoomReservationDates(String roomNumber, Date checkIn, Date checkOut) {
+    void mapRoomReservationDates(String roomNumber, Date checkIn, Date checkOut) {
         ArrayList<Date[]> reservationDates = new ArrayList<Date[]>();
         if (roomDatesMap.get(roomNumber) != null) {
             reservationDates = roomDatesMap.get(roomNumber);
@@ -74,7 +94,7 @@ public class ReservationService {
      * @param checkOut Check Out
      * @return New Reservation
      */
-    public static Reservation reserveARoom(Customer customer, IRoom room, Date checkIn, Date checkOut) {
+    public Reservation reserveARoom(Customer customer, IRoom room, Date checkIn, Date checkOut) {
         Reservation newBooking = new Reservation(customer, room, checkIn, checkOut);
         // Add new reservation in reservations list
         reservations.add(newBooking);
@@ -93,7 +113,7 @@ public class ReservationService {
      * @param checkOut
      * @return
      */
-    public static Collection<IRoom> findRooms(Date checkIn, Date checkOut) {
+    public Collection<IRoom> findRooms(Date checkIn, Date checkOut) {
         // TODO: Deduce the logic to derive unbooked rooms for the tenure
         Collection<IRoom> allRooms = getAllRooms();
         Collection<IRoom> availableRooms = new ArrayList<>(getAllRooms());
@@ -120,7 +140,7 @@ public class ReservationService {
      * @param customer Customer
      * @return Reservations
      */
-    public static Collection<Reservation> getCustomersReservation(Customer customer) {
+    public Collection<Reservation> getCustomersReservation(Customer customer) {
         List<Reservation> customerReservations = new ArrayList<Reservation>();
         ArrayList<Integer> reservationIndices = customerReservationMap.get(customer);
         if (reservationIndices != null) {
@@ -134,7 +154,7 @@ public class ReservationService {
     /**
      * Print all reservations
      */
-    public static void printAllReservation() {
+    public void printAllReservation() {
         for(Reservation reservation: reservations) {
             System.out.println(reservation);
         }

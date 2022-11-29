@@ -9,13 +9,16 @@ import java.util.Collection;
 import java.util.Date;
 
 public class HotelResource {
+    private CustomerService customerService = CustomerService.getInstance();
+    private ReservationService reservationService = ReservationService.getInstance();
+
     /**
      * Fetch customer
      * @param email Customer email
      * @return Customer
      */
     public Customer getCustomer(String email) {
-        return CustomerService.getCustomer(email);
+        return customerService.getCustomer(email);
     }
 
     /**
@@ -26,7 +29,7 @@ public class HotelResource {
      * @throws IllegalArgumentException
      */
     public void createACustomer(String email, String firstName, String lastName) throws IllegalArgumentException {
-        CustomerService.addCustomer(email, firstName, lastName);
+        customerService.addCustomer(email, firstName, lastName);
     }
 
     /**
@@ -35,7 +38,7 @@ public class HotelResource {
      * @return Room
      */
     public IRoom getRoom(String roomNumber) {
-        return ReservationService.getARoom(roomNumber);
+        return reservationService.getARoom(roomNumber);
     }
 
     /**
@@ -49,7 +52,7 @@ public class HotelResource {
     public Reservation bookARoom(String email, IRoom room, Date checkIn, Date checkOut) {
         Customer customer = getCustomer(email);
         if (customer != null) {
-            return ReservationService.reserveARoom(customer, room, checkIn, checkOut);
+            return reservationService.reserveARoom(customer, room, checkIn, checkOut);
         } else {
             return null;
         }
@@ -63,7 +66,7 @@ public class HotelResource {
     public Collection<Reservation> getCustomersReservation(String email) {
         Customer customer = getCustomer(email);
         if (customer != null) {
-            return ReservationService.getCustomersReservation(customer);
+            return reservationService.getCustomersReservation(customer);
         } else {
             return null;
         }
@@ -76,6 +79,6 @@ public class HotelResource {
      * @return Rooms
      */
     public Collection<IRoom> findARoom(Date checkIn, Date checkOut) {
-        return ReservationService.findRooms(checkIn, checkOut);
+        return reservationService.findRooms(checkIn, checkOut);
     }
 }

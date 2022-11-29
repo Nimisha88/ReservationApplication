@@ -8,13 +8,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class AdminResource {
+    private CustomerService customerService = CustomerService.getInstance();
+    private ReservationService reservationService = ReservationService.getInstance();
     /**
      * Fetch a customer
      * @param email Customer email
      * @return Customer
      */
     public Customer getCustomer(String email) {
-        return CustomerService.getCustomer(email);
+        return customerService.getCustomer(email);
     }
 
     /**
@@ -23,7 +25,7 @@ public class AdminResource {
      */
     public void addRoom(List<IRoom> rooms) {
         for (IRoom room: rooms) {
-            ReservationService.addRoom(room);
+            reservationService.addRoom(room);
         }
     }
 
@@ -32,7 +34,7 @@ public class AdminResource {
      * @return Rooms
      */
     public Collection<IRoom> getAllRooms() {
-        return ReservationService.getAllRooms();
+        return reservationService.getAllRooms();
     }
 
     /**
@@ -40,13 +42,13 @@ public class AdminResource {
      * @return Customers
      */
     public Collection<Customer> getAllCustomers() {
-        return CustomerService.getAllCustomers();
+        return customerService.getAllCustomers();
     }
 
     /**
      * Print all reservations
      */
     public void displayAllReservations() {
-        ReservationService.printAllReservation();
+        reservationService.printAllReservation();
     }
 }

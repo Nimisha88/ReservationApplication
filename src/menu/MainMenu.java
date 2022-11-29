@@ -63,22 +63,21 @@ public class MainMenu {
      * @param checkOut Check Out Date
      * @return True if rooms are available, False if not
      */
-    private static boolean displayAvailableRooms(Date checkIn, Date checkOut) {
+    private static Collection<IRoom> displayAvailableRooms(Date checkIn, Date checkOut) {
         try {
             Collection<IRoom> rooms = hotelAPI.findARoom(checkIn, checkOut);
             if(rooms.isEmpty()) {
                 System.out.println("\u001B[31m" + "Sorry! No rooms available for " + dateFormatter.format(checkIn) + " - " + dateFormatter.format(checkOut) + "\u001B[0m");
-                return false;
             } else {
                 for(IRoom room : rooms) {
                     System.out.println(room);
                 }
-                return true;
             }
+            return rooms;
         }
         catch (Exception e) {
             System.out.println("\u001B[31m" + "Encountered error in finding available rooms. Please try again later!" + "\u001B[0m");
-            return false;
+            return null;
         }
     }
 
@@ -123,7 +122,7 @@ public class MainMenu {
         Date today = new Date();
         Date checkIn;
         Date checkOut;
-        Boolean areRoomsAvailable;
+        Collection<IRoom> availableRooms;
 
         // Fetch Reservation Dates
         while(true) {
@@ -137,20 +136,24 @@ public class MainMenu {
         }
 
         // Display available rooms
-        areRoomsAvailable = displayAvailableRooms(checkIn, checkOut);
+        availableRooms = displayAvailableRooms(checkIn, checkOut);
 
-        if(!areRoomsAvailable) {
+        if (availableRooms == null) {
+            return;
+        }
+
+        if(availableRooms.isEmpty()) {
             checkIn = addDaysToADate(checkIn, 7);
             checkOut = addDaysToADate(checkOut, 7);
             System.out.println("\u001B[32m" + "Fetching rooms available after 7 days i.e. " + dateFormatter.format(checkIn) + " - " + dateFormatter.format(checkOut) + "\u001B[0m");
-            areRoomsAvailable = displayAvailableRooms(checkIn, checkOut);
+            availableRooms = displayAvailableRooms(checkIn, checkOut);
         }
 
-        if(areRoomsAvailable) {
+        if(!availableRooms.isEmpty()) {
             System.out.println("Enter Room Number of the room you would like to reserve:");
             String response = scanner.nextLine().trim();
             IRoom reserveRoom = hotelAPI.getRoom(response);
-            if (reserveRoom != null) {
+            if (reserveRoom != null && availableRooms.contains(reserveRoom)) {
                 reserveRoom(reserveRoom, checkIn, checkOut);
             } else {
                 System.out.println("\u001B[31m" + "No such room exists or is available for reservation! Please try again." + "\u001B[0m");

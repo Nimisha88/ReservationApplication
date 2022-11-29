@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class HotelApplication {
-
-    private static AdminResource adminAPI = new AdminResource();
-    private static HotelResource hotelAPI = new HotelResource();
     public static void main(String[] args) {
         MainMenu.displayMainMenu();
     }
